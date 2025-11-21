@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './index.css';
 import { Header } from './components/Header';
 import { AddAgenda } from './components/AddAgenda';
@@ -31,6 +31,42 @@ function App() {
     setTimeout(() => {
       setOverlayState(prev => ({ ...prev, visible: false }));
     }, 2500);
+  };
+
+  // Update favicon based on today's agenda completion
+  useEffect(() => {
+    if (agendas.length === 0) {
+      // Default favicon when no agendas
+      updateFavicon('/red.png');
+      return;
+    }
+
+    const todayAgenda = agendas[0]; // Most recent agenda
+    const totalTasks = todayAgenda.tasks.length;
+    const completedTasks = todayAgenda.tasks.filter(t => t.completed).length;
+    const completionPercentage = totalTasks === 0 ? 0 : (completedTasks / totalTasks) * 100;
+
+    let faviconPath = '/red.png'; // Default red
+
+    if (totalTasks > 0) {
+      if (completionPercentage >= 80) {
+        faviconPath = '/green.png';
+      } else if (completionPercentage >= 30) {
+        faviconPath = '/orange.png';
+      }
+    }
+
+    updateFavicon(faviconPath);
+  }, [agendas]);
+
+  const updateFavicon = (path: string) => {
+    const link = document.querySelector("link[rel*='icon']") as HTMLLinkElement || document.createElement('link');
+    link.type = 'image/png';
+    link.rel = 'icon';
+    link.href = path;
+    if (!document.querySelector("link[rel*='icon']")) {
+      document.getElementsByTagName('head')[0].appendChild(link);
+    }
   };
 
   const handleAddAgenda = (tasks: string[]) => {
@@ -96,6 +132,7 @@ function App() {
 
   return (
     <div className={`container ${overlayState.visible ? 'rattle' : ''}`}>
+
       {overlayState.visible && (
         <div className="you-died-overlay">
           <div className={`you-died-text ${overlayState.type === 'success' ? 'overlay-text-success' : ''}`}>

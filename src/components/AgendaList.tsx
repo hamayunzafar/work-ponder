@@ -13,12 +13,7 @@ export const AgendaList: React.FC<AgendaListProps> = ({ agendas, onToggleTask })
     }
 
     return (
-        <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-            gap: '24px',
-            padding: '20px 0'
-        }}>
+        <div className="agenda-grid">
             {agendas.map((agenda, index) => (
                 <div key={agenda.id} style={{ height: '100%' }} className={index !== 0 ? 'past-agenda' : ''}>
                     <AgendaCard agenda={agenda} onToggleTask={onToggleTask} />

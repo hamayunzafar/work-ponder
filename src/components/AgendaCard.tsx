@@ -11,15 +11,15 @@ export const AgendaCard: React.FC<AgendaCardProps> = ({ agenda, onToggleTask }) 
     const completedTasks = agenda.tasks.filter(t => t.completed).length;
     const completionPercentage = totalTasks === 0 ? 0 : (completedTasks / totalTasks) * 100;
 
-    let gradient = 'radial-gradient(141.42% 141.42% at 0% 0%, #E30000 0%, #FFF 25%, #E30000 48.56%, #8A0202 70%, #E30000 100%)'; // Default Red (< 30%)
+    let gradient = 'radial-gradient(141.42% 141.42% at 0% 0%, #3F3F3F 0%, #1C1212 73.08%, #E30000 100%)'; // Default Red (< 30%)
 
     if (totalTasks > 0) {
         if (completionPercentage >= 80) {
             // Green (80-100%)
-            gradient = 'radial-gradient(141.42% 141.42% at 0% 0%, #00DD04 0%, #FFF 25%, #00DD04 48.56%, #048C07 70%, #00DD04 100%)';
+            gradient = 'radial-gradient(141.42% 141.42% at 0% 0%, #3F3F3F 0%, #121C15 73.08%, #00E33D 100%)';
         } else if (completionPercentage >= 30) {
             // Orange (30-79%)
-            gradient = 'radial-gradient(141.42% 141.42% at 0% 0%, #FFA216 0%, #FFF 25%, #FFA216 48.56%, #DB5B00 70%, #FFA216 100%)';
+            gradient = 'radial-gradient(141.42% 141.42% at 0% 0%, #3F3F3F 0%, #1C1812 73.08%, #E38800 100%)';
         }
     }
 
@@ -64,7 +64,6 @@ export const AgendaCard: React.FC<AgendaCardProps> = ({ agenda, onToggleTask }) 
                             alignItems: 'center',
                             gap: '16px',
                             cursor: 'pointer',
-                            opacity: task.completed ? 0.4 : 1,
                             transition: 'opacity 0.2s ease',
                             background: 'rgba(255,255,255,0.2)',
                             padding: '12px 16px',
@@ -87,6 +86,7 @@ export const AgendaCard: React.FC<AgendaCardProps> = ({ agenda, onToggleTask }) 
                                     background: task.completed ? '#000' : 'transparent',
                                     borderColor: task.completed ? '#000' : 'rgba(0,0,0,0.4)',
                                     transition: 'all 0.2s var(--transition-bezier)',
+                                    opacity: task.completed ? 0.3 : 1,
                                     margin: 0,
                                     padding: 0
                                 }}
@@ -110,7 +110,8 @@ export const AgendaCard: React.FC<AgendaCardProps> = ({ agenda, onToggleTask }) 
                             )}
                         </div>
 
-                        <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', flex: 1, opacity: task.completed ? 0.4 : 1 }}>
+                            
                             <span style={{
                                 fontSize: '16px',
                                 fontWeight: 600,
@@ -125,7 +126,6 @@ export const AgendaCard: React.FC<AgendaCardProps> = ({ agenda, onToggleTask }) 
                                     textTransform: 'uppercase',
                                     letterSpacing: '0.5px',
                                     color: '#000',
-                                    opacity: 0.6,
                                     marginTop: '4px'
                                 }}>
                                     Carried Over
