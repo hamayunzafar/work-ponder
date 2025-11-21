@@ -28,7 +28,7 @@ export const AgendaCard: React.FC<AgendaCardProps> = ({ agenda, onToggleTask }) 
             height: '100%',
             display: 'flex',
             flexDirection: 'column',
-            boxShadow: '0 20px 40px -10px rgba(142, 197, 252, 0.3)',
+            boxShadow: '0px 20px 10px -10px rgb(0 0 0 / 0.8)',
             transition: 'transform 0.3s var(--transition-bezier)',
             background: gradient
         }}>

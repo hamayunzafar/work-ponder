@@ -126,7 +126,7 @@ input:focus {
     overflow: hidden;
 }
 
-.orbital-card::before {
+/* .orbital-card::before {
     content: "";
     position: absolute;
     top: 5%;
@@ -136,7 +136,7 @@ input:focus {
     background: rgba(255, 255, 255, 0.8);
     filter: blur(15px);
     z-index: -1;
-}
+} */
 
 .orbital-tag {
     font-family: var(--font-mono);
