@@ -15,7 +15,7 @@ export const AgendaList: React.FC<AgendaListProps> = ({ agendas, onToggleTask })
     return (
         <div className="agenda-grid">
             {agendas.map((agenda, index) => (
-                <div key={agenda.id} style={{ height: '100%' }} className={index !== 0 ? 'past-agenda' : ''}>
+                <div key={agenda.id} className={`agenda-list-item ${index !== 0 ? 'past-agenda' : ''}`}>
                     <AgendaCard agenda={agenda} onToggleTask={onToggleTask} />
                 </div>
             ))}

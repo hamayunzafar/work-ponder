@@ -3,6 +3,11 @@ import './index.css';
 import { Header } from './components/Header';
 import { AddAgenda } from './components/AddAgenda';
 import { AgendaList } from './components/AgendaList';
+import { Auth } from './components/Auth';
+import { useAuth } from './contexts/AuthContext';
+import { Footer } from './components/Footer';
+import { PrivacyPolicy } from './components/PrivacyPolicy';
+import { TermsOfService } from './components/TermsOfService';
 
 export interface Task {
   id: string;
@@ -25,6 +30,31 @@ function App() {
     message: '',
     type: 'error'
   });
+  const [currentPage, setCurrentPage] = useState<'app' | 'privacy' | 'terms'>('app');
+
+  const { user, loading, isPasswordRecovery } = useAuth();
+
+  // Handle hash-based navigation
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.slice(1); // Remove the #
+      if (hash === 'privacy') {
+        setCurrentPage('privacy');
+      } else if (hash === 'terms') {
+        setCurrentPage('terms');
+      } else {
+        setCurrentPage('app');
+        window.location.hash = ''; // Clear hash
+      }
+    };
+
+    // Check initial hash
+    handleHashChange();
+
+    // Listen for hash changes
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
 
   const triggerOverlay = (message: string, type: 'error' | 'success') => {
     setOverlayState({ visible: true, message, type });
@@ -140,32 +170,44 @@ function App() {
           </div>
         </div>
       )}
-      <Header />
 
-      <main>
-        <AddAgenda onAdd={handleAddAgenda} triggerOverlay={triggerOverlay} />
+      {/* Show legal pages when navigating to them */}
+      {currentPage === 'privacy' ? (
+        <PrivacyPolicy />
+      ) : currentPage === 'terms' ? (
+        <TermsOfService />
+      ) : loading ? (
+        <div className="auth-container">
+          <div className="auth-loading">Loading...</div>
+        </div>
+      ) : !user || isPasswordRecovery ? (
+        <>
+          <Auth />
+          <Footer />
+        </>
+      ) : (
+        <>
+          <Header />
 
-        <AgendaList agendas={agendas} onToggleTask={handleToggleTask} />
+          <main>
+            <AddAgenda onAdd={handleAddAgenda} triggerOverlay={triggerOverlay} />
 
-        {agendas.length === 0 && (
+            <AgendaList agendas={agendas} onToggleTask={handleToggleTask} />
 
-          <div id='intro-text' style={{ 
-            textAlign: 'center', 
-            color: '#ffffffff', 
-            opacity: 0.6, 
-            maxWidth: '600px', 
-            margin: '0 auto', 
-            flex: 1, 
-            display: 'flex', 
-            flexDirection: 'column', justifyContent: 'center' }}>
+            {agendas.length === 0 && (
 
-            <h2 style={{ marginBottom: '12px', fontFamily: 'monospace', fontSize: '24px' }}>Here's what this tool is all about</h2>
+              <div className="intro-text">
 
-            <p style={{ fontFamily: 'monospace' }}>You can add an agenda once per day or multiple times a day. If you complete all of it the card turns green. If you do some of it, it turns orange. If you do almost none of it, it turns red. I use this system to see how well my week has been going, feel free to use it yourself as well.</p>
-          </div>
-        )
-        }
-      </main >
+                <h2 className="intro-text-title">Here's what this tool is all about</h2>
+
+                <p className="intro-text-description">You can add an agenda once per day or multiple times a day. If you complete all of it the card turns green. If you do some of it, it turns orange. If you do almost none of it, it turns red. I use this system to see how well my week has been going, feel free to use it yourself as well.</p>
+              </div>
+            )
+            }
+          </main >
+          <Footer />
+        </>
+      )}
     </div >
   );
 }
