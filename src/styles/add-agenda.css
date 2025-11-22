@@ -1,0 +1,125 @@
+/* ============================================
+   ADD AGENDA COMPONENT STYLES
+   ============================================ */
+
+.add-agenda-section {
+    max-width: 600px;
+    width: 100%;
+    margin: 4px auto 40px;
+    background: linear-gradient(95deg, #363636 0%, #212121 25%, #1A1A1A 48.56%, #212121 77.43%);
+    border-radius: var(--radius-card);
+    border: 1px solid #333;
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    transition: all 0.3s var(--transition-bezier);
+}
+
+.add-agenda-button {
+    width: 100%;
+    text-align: left;
+    font-size: 16px;
+    color: #888;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+}
+
+.add-agenda-button-icon {
+    background: #333;
+    color: white;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+
+.add-agenda-date {
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #888;
+    padding-bottom: 8px;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.add-agenda-tasks {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.add-agenda-task-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.add-agenda-task-input {
+    flex: 1;
+}
+
+.add-agenda-remove-btn {
+    color: #555;
+    padding: 4px;
+}
+
+.add-agenda-add-task-btn {
+    align-self: flex-start;
+    color: #8EC5FC;
+    font-weight: 600;
+    font-size: 12px;
+    margin-top: 8px;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.add-agenda-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.add-agenda-cancel-btn {
+    padding: 10px 20px;
+    font-weight: 600;
+    color: #888;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    text-transform: uppercase;
+}
+
+.add-agenda-submit-btn {
+    background: white;
+    color: black;
+    padding: 10px 24px;
+    border-radius: var(--radius-pill);
+    font-weight: 700;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.add-agenda-submit-btn.disabled {
+    opacity: 0.5;
+}
+
+.add-agenda-shortcut {
+    opacity: 0.5;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}

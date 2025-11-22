@@ -1,0 +1,221 @@
+/* ============================================
+   LEGAL PAGES STYLES
+   ============================================ */
+
+.legal-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+.legal-content {
+    max-width: 900px;
+    width: 100%;
+    border-radius: var(--radius-card);
+    border: 1px solid #333;
+    padding: 48px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    animation: fadeIn 0.6s var(--transition-bezier) forwards;
+}
+
+.legal-header {
+    text-align: center;
+    margin-bottom: 48px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid #333;
+}
+
+.legal-logo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.legal-logo-title {
+    font-family: var(--font-mono);
+    font-size: 16px;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.legal-title {
+    font-family: var(--font-mono);
+    font-size: 32px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.legal-subtitle {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: #888;
+    letter-spacing: 1px;
+}
+
+.legal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+.legal-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.legal-section-title {
+    font-family: var(--font-mono);
+    font-size: 18px;
+    font-weight: 700;
+    color: #8EC5FC;
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+}
+
+.legal-subsection-title {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-top: 8px;
+    margin-bottom: 4px;
+    letter-spacing: 0.5px;
+}
+
+.legal-text {
+    font-family: var(--font-family);
+    font-size: 14px;
+    line-height: 1.7;
+    color: #cccccc;
+    margin-bottom: 12px;
+}
+
+.legal-text strong {
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.legal-list {
+    list-style: disc;
+    margin-left: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.legal-list li {
+    font-family: var(--font-family);
+    font-size: 14px;
+    line-height: 1.7;
+    color: #cccccc;
+}
+
+.legal-list li strong {
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.legal-company-info {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid #333;
+    border-radius: var(--radius-button);
+    padding: 20px;
+    margin-top: 12px;
+}
+
+.legal-company-info p {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.6;
+    color: #888;
+    margin: 4px 0;
+}
+
+.legal-company-info strong {
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.legal-link {
+    color: #8EC5FC;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.legal-link:hover {
+    color: #a8d5fc;
+    text-decoration: underline;
+}
+
+.legal-back-btn {
+    display: block;
+    margin: 32px auto 0;
+    padding: 12px 32px;
+    background: white;
+    color: black;
+    border-radius: var(--radius-pill);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: transform 0.1s ease, opacity 0.2s ease;
+}
+
+.legal-back-btn:hover {
+    transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+    .legal-content {
+        padding: 32px 24px;
+    }
+
+    .legal-title {
+        font-size: 24px;
+    }
+
+    .legal-section-title {
+        font-size: 16px;
+    }
+
+    .legal-text,
+    .legal-list li {
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 540px) {
+    .legal-container {
+        padding: 20px 12px;
+    }
+
+    .legal-content {
+        padding: 24px 20px;
+    }
+
+    .legal-header {
+        margin-bottom: 32px;
+        padding-bottom: 24px;
+    }
+
+    .legal-title {
+        font-size: 20px;
+    }
+
+    .legal-body {
+        gap: 32px;
+    }
+}

@@ -1,13 +1,32 @@
 import React, { useState, useEffect } from 'react';
+import { Command, CornerDownLeft } from 'lucide-react';
 
 interface AddAgendaProps {
     onAdd: (tasks: string[]) => void;
     triggerOverlay: (message: string, type: 'error' | 'success') => void;
+    nextTaskNumber?: number;
+    initialTasks?: string[];
+    isEditing?: boolean;
+    onCancel?: () => void;
 }
 
-export const AddAgenda: React.FC<AddAgendaProps> = ({ onAdd, triggerOverlay }) => {
+export const AddAgenda: React.FC<AddAgendaProps> = ({ 
+    onAdd, 
+    triggerOverlay, 
+    nextTaskNumber = 1,
+    initialTasks,
+    isEditing = false,
+    onCancel
+}) => {
     const [tasks, setTasks] = useState<string[]>(['']);
     const [isExpanded, setIsExpanded] = useState(false);
+
+    useEffect(() => {
+        if (initialTasks && initialTasks.length > 0) {
+            setTasks(initialTasks);
+            setIsExpanded(true);
+        }
+    }, [initialTasks]);
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
@@ -46,10 +65,24 @@ export const AddAgenda: React.FC<AddAgendaProps> = ({ onAdd, triggerOverlay }) =
             return;
         }
         onAdd(validTasks);
-        triggerOverlay("💦 AGENDA ADDED", 'success');
-        setTasks(['']);
-        setIsExpanded(false);
+        if (!isEditing) {
+            triggerOverlay("💦 AGENDA ADDED", 'success');
+            setTasks(['']);
+            setIsExpanded(false);
+        } else {
+            triggerOverlay("✨ AGENDA UPDATED", 'success');
+            // Don't clear tasks immediately if editing, let parent handle it or keep it open?
+            // Usually we want to close it.
+            setTasks(['']);
+            setIsExpanded(false);
+        }
     };
+
+    // Calculate the starting task number based on existing tasks for today
+    // We need to pass the current task count from the parent or fetch it, but for now let's just use local index + 1
+    // Actually, to have continuity, we need to know how many tasks are already in today's agenda.
+    // Since we don't have that prop passed down yet, I'll stick to local index for now, 
+    // but the user asked for continuity. Let's update the props to accept `nextTaskNumber`.
 
     return (
         <div className="add-agenda-section">
@@ -58,13 +91,13 @@ export const AddAgenda: React.FC<AddAgendaProps> = ({ onAdd, triggerOverlay }) =
                     onClick={() => setIsExpanded(true)}
                     className="add-agenda-button"
                 >
-                    <span>Start a new agenda...</span>
-                    <span className="add-agenda-button-icon">+</span>
+                    <span>{isEditing ? 'Edit tasks...' : "Add today's tasks..."}</span>
+                    <span className="add-agenda-button-icon">{isEditing ? '✎' : '+'}</span>
                 </button>
             ) : (
                 <div className="fade-in">
                     <div className="add-agenda-date">
-                        {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+                        {isEditing ? 'Editing Agenda' : new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
                     </div>
 
                     <div className="add-agenda-tasks">
@@ -72,7 +105,7 @@ export const AddAgenda: React.FC<AddAgendaProps> = ({ onAdd, triggerOverlay }) =
                             <div key={index} className="add-agenda-task-row">
                                 <input
                                     type="text"
-                                    placeholder={`Task ${index + 1}`}
+                                    placeholder={`Task ${nextTaskNumber + index}`}
                                     value={task}
                                     onChange={(e) => handleTaskChange(index, e.target.value)}
                                     className="add-agenda-task-input"
@@ -102,7 +135,11 @@ export const AddAgenda: React.FC<AddAgendaProps> = ({ onAdd, triggerOverlay }) =
 
                     <div className="add-agenda-actions">
                         <button
-                            onClick={() => setIsExpanded(false)}
+                            onClick={() => {
+                                setIsExpanded(false);
+                                if (onCancel) onCancel();
+                                setTasks(['']);
+                            }}
                             className="add-agenda-cancel-btn"
                         >
                             Cancel
@@ -111,7 +148,10 @@ export const AddAgenda: React.FC<AddAgendaProps> = ({ onAdd, triggerOverlay }) =
                             onClick={handleSubmit}
                             className={`add-agenda-submit-btn ${tasks.every(t => !t.trim()) ? 'disabled' : ''}`}
                         >
-                            Create Agenda (CMD + Enter)
+                            {isEditing ? 'Confirm edits' : 'Create tasks'} <span className="add-agenda-shortcut">
+                                <Command size={14} strokeWidth={2} />
+                                <CornerDownLeft size={14} strokeWidth={2} />
+                            </span>
                         </button>
                     </div>
                 </div>

@@ -8,6 +8,7 @@ import { useAuth } from './contexts/AuthContext';
 import { Footer } from './components/Footer';
 import { PrivacyPolicy } from './components/PrivacyPolicy';
 import { TermsOfService } from './components/TermsOfService';
+import { supabase } from './lib/supabase';
 
 export interface Task {
   id: string;
@@ -25,6 +26,7 @@ export interface Agenda {
 
 function App() {
   const [agendas, setAgendas] = useState<Agenda[]>([]);
+  const [editingAgenda, setEditingAgenda] = useState<Agenda | null>(null);
   const [overlayState, setOverlayState] = useState<{ visible: boolean; message: string; type: 'error' | 'success' }>({
     visible: false,
     message: '',
@@ -99,55 +101,157 @@ function App() {
     }
   };
 
-  const handleAddAgenda = (tasks: string[]) => {
-    const newAgenda: Agenda = {
-      id: crypto.randomUUID(),
-      title: new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }),
-      tasks: tasks.map(text => ({ id: crypto.randomUUID(), text, completed: false })),
-      createdAt: Date.now()
-    };
+  const handleAddAgenda = async (tasks: string[]) => {
+    if (!user) return;
 
-    // Check for unchecked tasks in the most recent agenda
+    if (editingAgenda) {
+        // Handle Update
+        // 1. Delete existing tasks
+        const { error: deleteError } = await supabase
+            .from('tasks')
+            .delete()
+            .eq('agenda_id', editingAgenda.id);
+
+        if (deleteError) {
+            console.error('Error deleting old tasks:', deleteError);
+            triggerOverlay('Failed to update agenda', 'error');
+            return;
+        }
+
+        // 2. Insert new tasks
+        const tasksToInsert = tasks.map(text => ({
+            agenda_id: editingAgenda.id,
+            user_id: user.id,
+            text,
+            completed: false,
+            is_carried_over: false
+        }));
+
+        const { error: insertError } = await supabase
+            .from('tasks')
+            .insert(tasksToInsert);
+
+        if (insertError) {
+            console.error('Error inserting new tasks:', insertError);
+            triggerOverlay('Failed to update agenda', 'error');
+        } else {
+            await fetchAgendas();
+            setEditingAgenda(null);
+        }
+        return;
+    }
+
+    const todayTitle = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+    
+    // Check if today's agenda already exists
+    let targetAgendaId: string | null = null;
+    let isNewAgenda = false;
+
     if (agendas.length > 0) {
-      const lastAgenda = agendas[0];
+      const latestAgenda = agendas[0];
+      if (latestAgenda.title === todayTitle) {
+        targetAgendaId = latestAgenda.id;
+      }
+    }
+
+    // If no agenda for today, create one
+    if (!targetAgendaId) {
+      isNewAgenda = true;
+      const { data: agendaData, error: agendaError } = await supabase
+        .from('agendas')
+        .insert({ title: todayTitle, user_id: user.id })
+        .select()
+        .single();
+
+      if (agendaError) {
+        console.error(agendaError);
+        triggerOverlay('Error creating agenda', 'error');
+        return;
+      }
+      targetAgendaId = agendaData.id;
+    }
+
+    const tasksToInsert = tasks.map(text => ({
+      agenda_id: targetAgendaId,
+      user_id: user.id,
+      text,
+      completed: false,
+      is_carried_over: false
+    }));
+
+    // Only check for carry-over if it's a BRAND NEW agenda
+    if (isNewAgenda && agendas.length > 0) {
+      const lastAgenda = agendas[0]; // This is actually the previous day's agenda now, since we haven't refreshed state yet
+      // Wait, if we just created a new agenda, 'agendas' state still holds the old list.
+      // So agendas[0] is indeed the most recent *previous* agenda.
+      
       const uncheckedTasks = lastAgenda.tasks.filter(t => !t.completed);
 
       if (uncheckedTasks.length > 0) {
-        // Add carried over tasks to the new agenda
         const carriedOverTasks = uncheckedTasks.map(t => ({
-          ...t,
-          id: crypto.randomUUID(), // New ID for the new agenda
-          isCarriedOver: true
+          agenda_id: targetAgendaId,
+          user_id: user.id,
+          text: t.text,
+          completed: false,
+          is_carried_over: true
         }));
 
-        // We'll add them initially, but we want them to appear with a delay.
-        // So we'll filter them out first, then add them back.
-        // Actually, a better approach for the "delayed appearance" is to add them but control their visibility via CSS or a temporary state.
-        // But based on the requirement "appear after a 1-second delay", let's use a timeout to update the state.
+        // Insert new tasks first
+        const { error: tasksError } = await supabase.from('tasks').insert(tasksToInsert);
+        if (tasksError) {
+          console.error(tasksError);
+          triggerOverlay('Error adding tasks', 'error');
+          return;
+        }
 
-        newAgenda.tasks = [...newAgenda.tasks]; // Start with only new tasks
+        // Refresh to show new agenda
+        await fetchAgendas();
 
-        setAgendas(prev => [newAgenda, ...prev]);
-
-        setTimeout(() => {
-          setAgendas(prev => prev.map(agenda => {
-            if (agenda.id === newAgenda.id) {
-              return {
-                ...agenda,
-                tasks: [...agenda.tasks, ...carriedOverTasks]
-              };
-            }
-            return agenda;
-          }));
+        // Delayed insert for carried over tasks
+        setTimeout(async () => {
+          const { error: carryError } = await supabase.from('tasks').insert(carriedOverTasks);
+          if (!carryError) {
+            await fetchAgendas();
+          }
         }, 1000);
         return;
       }
     }
 
-    setAgendas(prev => [newAgenda, ...prev]);
+    // Normal insert (either appending to today's agenda OR new agenda with no carry-over)
+    const { error: tasksError } = await supabase.from('tasks').insert(tasksToInsert);
+    if (tasksError) {
+      console.error(tasksError);
+      triggerOverlay('Error adding tasks', 'error');
+    } else {
+      await fetchAgendas();
+    }
   };
 
-  const handleToggleTask = (agendaId: string, taskId: string) => {
+  const handleEditAgenda = (agenda: Agenda) => {
+      setEditingAgenda(agenda);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleDeleteAgenda = async (agendaId: string) => {
+      if (!confirm('Are you sure you want to delete this agenda?')) return;
+
+      const { error } = await supabase
+          .from('agendas')
+          .delete()
+          .eq('id', agendaId);
+
+      if (error) {
+          console.error('Error deleting agenda:', error);
+          triggerOverlay('Failed to delete agenda', 'error');
+      } else {
+          triggerOverlay('Agenda deleted', 'success');
+          await fetchAgendas();
+      }
+  };
+
+  const handleToggleTask = async (agendaId: string, taskId: string) => {
+    // Optimistic update
     setAgendas(prev => prev.map(agenda => {
       if (agenda.id !== agendaId) return agenda;
       return {
@@ -158,7 +262,72 @@ function App() {
         })
       };
     }));
+
+    // DB Update
+    const agenda = agendas.find(a => a.id === agendaId);
+    const task = agenda?.tasks.find(t => t.id === taskId);
+    
+    if (task) {
+      const { error } = await supabase
+        .from('tasks')
+        .update({ completed: !task.completed })
+        .eq('id', taskId);
+
+      if (error) {
+        console.error('Error updating task:', error);
+        triggerOverlay('Failed to update task', 'error');
+        // Revert state by refetching
+        fetchAgendas();
+      }
+    }
   };
+
+  const fetchAgendas = async () => {
+    if (!user) return;
+
+    const { data: agendasData, error: agendasError } = await supabase
+      .from('agendas')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (agendasError) {
+      console.error('Error fetching agendas:', agendasError);
+      return;
+    }
+
+    const { data: tasksData, error: tasksError } = await supabase
+      .from('tasks')
+      .select('*');
+
+    if (tasksError) {
+      console.error('Error fetching tasks:', tasksError);
+      return;
+    }
+
+    const formattedAgendas: Agenda[] = agendasData.map(agenda => ({
+      id: agenda.id,
+      title: agenda.title,
+      createdAt: new Date(agenda.created_at).getTime(),
+      tasks: tasksData
+        .filter(task => task.agenda_id === agenda.id)
+        .map(task => ({
+          id: task.id,
+          text: task.text,
+          completed: task.completed,
+          isCarriedOver: task.is_carried_over
+        }))
+    }));
+
+    setAgendas(formattedAgendas);
+  };
+
+  useEffect(() => {
+    if (user) {
+      fetchAgendas();
+    } else {
+      setAgendas([]);
+    }
+  }, [user]);
 
   return (
     <div className={`container ${overlayState.visible ? 'rattle' : ''}`}>
@@ -190,9 +359,21 @@ function App() {
           <Header />
 
           <main>
-            <AddAgenda onAdd={handleAddAgenda} triggerOverlay={triggerOverlay} />
+            <AddAgenda 
+              onAdd={handleAddAgenda} 
+              triggerOverlay={triggerOverlay} 
+              nextTaskNumber={agendas.length > 0 && agendas[0].title === new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }) ? agendas[0].tasks.length + 1 : 1}
+              initialTasks={editingAgenda ? editingAgenda.tasks.map(t => t.text) : undefined}
+              isEditing={!!editingAgenda}
+              onCancel={() => setEditingAgenda(null)}
+            />
 
-            <AgendaList agendas={agendas} onToggleTask={handleToggleTask} />
+            <AgendaList 
+                agendas={agendas} 
+                onToggleTask={handleToggleTask} 
+                onEdit={handleEditAgenda}
+                onDelete={handleDeleteAgenda}
+            />
 
             {agendas.length === 0 && (
 

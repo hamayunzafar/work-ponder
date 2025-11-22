@@ -5,9 +5,11 @@ import { AgendaCard } from './AgendaCard';
 interface AgendaListProps {
     agendas: Agenda[];
     onToggleTask: (agendaId: string, taskId: string) => void;
+    onEdit: (agenda: Agenda) => void;
+    onDelete: (agendaId: string) => void;
 }
 
-export const AgendaList: React.FC<AgendaListProps> = ({ agendas, onToggleTask }) => {
+export const AgendaList: React.FC<AgendaListProps> = ({ agendas, onToggleTask, onEdit, onDelete }) => {
     if (agendas.length === 0) {
         return null;
     }
@@ -16,7 +18,12 @@ export const AgendaList: React.FC<AgendaListProps> = ({ agendas, onToggleTask })
         <div className="agenda-grid">
             {agendas.map((agenda, index) => (
                 <div key={agenda.id} className={`agenda-list-item ${index !== 0 ? 'past-agenda' : ''}`}>
-                    <AgendaCard agenda={agenda} onToggleTask={onToggleTask} />
+                    <AgendaCard 
+                        agenda={agenda} 
+                        onToggleTask={onToggleTask} 
+                        onEdit={onEdit}
+                        onDelete={onDelete}
+                    />
                 </div>
             ))}
         </div>

@@ -1,0 +1,79 @@
+/* ============================================
+   FOOTER COMPONENT STYLES
+   ============================================ */
+
+.footer {
+    width: 100%;
+    padding: 40px 20px 20px;
+    margin-top: auto;
+    border-top: 1px solid #333;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.footer-content {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.footer-links {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.footer-link {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: color 0.2s ease;
+    text-decoration: none;
+}
+
+.footer-link:hover {
+    color: #8EC5FC;
+}
+
+.footer-divider {
+    color: #333;
+    font-size: 12px;
+}
+
+.footer-copyright {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: #666;
+    letter-spacing: 0.5px;
+}
+
+.footer-copyright strong {
+    color: #888;
+}
+
+.footer-location {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: #555;
+    letter-spacing: 0.5px;
+}
+
+@media (max-width: 540px) {
+    .footer {
+        padding: 30px 16px 16px;
+    }
+
+    .footer-links {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .footer-divider {
+        display: none;
+    }
+}

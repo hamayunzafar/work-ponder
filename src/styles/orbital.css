@@ -1,0 +1,145 @@
+/* Orbital Specifics */
+.orbital-card {
+    /* background: radial-gradient(141.42% 141.42% at 0% 0%, #9A9A9A 0%, #FFF 25%, #E3E3E3 48.56%, #FFF 70%, #979797 100%); */
+    /* background: var(--gradient-orbital); */
+    color: #000;
+    /* Dark text on bright gradient */
+    border-radius: var(--radius-card);
+    padding: 18px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* .orbital-card::before {
+    content: "";
+    position: absolute;
+    top: 5%;
+    left: 5%;
+    width: 90%;
+    height: 90%;
+    background: rgba(255, 255, 255, 0.8);
+    filter: blur(15px);
+    z-index: -1;
+} */
+
+.orbital-tag {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.1);
+    font-weight: 700;
+}
+
+/* You Died Effect */
+.you-died-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    animation: fadeInOut 2.5s ease-in-out forwards;
+    pointer-events: none;
+}
+
+.you-died-text {
+    font-family: var(--font-serif);
+    text-align: center;
+    font-size: 100px;
+    color: #8A0202;
+    text-shadow: 0 0 20px rgba(138, 2, 2, 0.5);
+    letter-spacing: 4px;
+    opacity: 0;
+    animation: textFadeIn 2.5s ease-in-out forwards;
+}
+
+@keyframes fadeInOut {
+    0% {
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 1;
+    }
+
+    80% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+@keyframes textFadeIn {
+    0% {
+        opacity: 0;
+        transform: scale(1.1);
+    }
+
+    15% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    85% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    100% {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+}
+
+.rattle {
+    animation: rattle 0.5s cubic-bezier(.36, .07, .19, .97) both;
+}
+
+@keyframes rattle {
+
+    10%,
+    90% {
+        transform: translate3d(-1px, 0, 0);
+    }
+
+    20%,
+    80% {
+        transform: translate3d(2px, 0, 0);
+    }
+
+    30%,
+    50%,
+    70% {
+        transform: translate3d(-4px, 0, 0);
+    }
+
+    40%,
+    60% {
+        transform: translate3d(4px, 0, 0);
+    }
+}
+
+.overlay-text-success {
+    color: #00DD04;
+    text-shadow: 0 0 20px rgba(0,221,4,0.5);
+}
+
+/* Past Agenda Opacity */
+.past-agenda {
+    opacity: 0.3;
+    transition: opacity 0.3s var(--transition-bezier);
+}
+
+.past-agenda:hover {
+    opacity: 1;
+}
