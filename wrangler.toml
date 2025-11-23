@@ -1,0 +1,19 @@
+name = "work-ponder"
+main = "src/worker.ts"
+compatibility_date = "2024-11-22"
+
+# Custom Domain
+routes = [
+	{ pattern = "workponder.com", custom_domain = true },
+	{ pattern = "www.workponder.com", custom_domain = true }
+]
+
+# Serve the 'dist' folder as static assets
+[assets]
+directory = "dist"
+binding = "ASSETS"
+
+# Environment variables (Add your Supabase keys here via dashboard or 'wrangler secret put')
+# [vars]
+# VITE_SUPABASE_URL = "..."
+# VITE_SUPABASE_ANON_KEY = "..."

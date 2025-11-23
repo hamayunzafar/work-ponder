@@ -36,6 +36,15 @@ function App() {
 
   const { user, loading, isPasswordRecovery } = useAuth();
 
+  // Update document title based on auth state
+  useEffect(() => {
+    if (!user) {
+      document.title = "Workponder is Great";
+    } else {
+      document.title = "Today's Tasks";
+    }
+  }, [user]);
+
   // Handle hash-based navigation
   useEffect(() => {
     const handleHashChange = () => {
